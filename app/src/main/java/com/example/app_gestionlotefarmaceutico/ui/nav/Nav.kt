@@ -56,10 +56,10 @@ fun AppNavigation(navController: NavHostController) {
             QrScannerScreen(onQrDetected = {})
         }
 
-        // 📦 Movimiento de productos (solo demo)
         composable(Routes.MOVS) {
-            MovimientosScreen()
+            MovimientosScreen(navController = navController)
         }
+
 
         // 👤 Gestión de usuarios (solo admin en demo)
         composable(Routes.USERS) {

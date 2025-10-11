@@ -68,8 +68,9 @@ fun AppNavigation(navController: NavHostController) {
 
         // 📋 Consulta de inventario
         composable(Routes.CONSULTA) {
-            ConsultaInventarioScreen()
+            ConsultaInventarioScreen(navController)
         }
+
 
         // 🧾 Generador de códigos QR
         composable(Routes.GENERATE_QR) {

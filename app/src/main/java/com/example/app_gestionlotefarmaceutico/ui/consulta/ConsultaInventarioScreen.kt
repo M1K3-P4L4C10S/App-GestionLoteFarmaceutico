@@ -40,8 +40,6 @@ fun ConsultaInventarioScreen(navController: NavHostController) {
         LoteItem("Omeprazol 20mg", "L-202405", "2027-01-05", 200),
         LoteItem("Suero Oral", "L-202309", "2025-08-30", 45)
     )
-
-    // 🔍 Filtramos los productos próximos a caducar (menos de 6 meses)
     val formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd")
     val hoy = LocalDate.now()
     val proximosAVencer = inventario.filter {

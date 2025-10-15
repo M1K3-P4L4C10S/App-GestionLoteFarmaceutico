@@ -56,6 +56,17 @@ kotlin {
 }
 
 dependencies {
+//escaneo de códigos QR
+implementation("com.google.mlkit:barcode-scanning:17.2.0")
+
+//Librería para generar códigos QR
+implementation("com.google.zxing:core:3.5.2")
+
+//CameraX (para usar la cámara del dispositivo)
+implementation("androidx.camera:camera-camera2:1.3.4")
+implementation("androidx.camera:camera-lifecycle:1.3.4")
+implementation("androidx.camera:camera-view:1.3.4") 
+
     // Jetpack Compose
     implementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("androidx.activity:activity-compose:1.9.0")

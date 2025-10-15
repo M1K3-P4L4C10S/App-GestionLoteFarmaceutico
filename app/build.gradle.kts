@@ -14,10 +14,10 @@ android {
         versionCode = 1
         versionName = "0.1.0"
 
-        // 🌐 URL base del backend (modifícala cuando tu servidor PostgreSQL esté activo)
+        // URL base del backend (modificable)
         buildConfigField("String", "BASE_URL", "\"http://10.0.2.2:8080/\"")
 
-        // ✅ Soporte completo para emuladores y dispositivos reales
+        // Soporte para arquitecturas de emuladores y dispositivos
         ndk {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
@@ -29,7 +29,7 @@ android {
     }
 
     composeOptions {
-        // ⚙️ Compatible con Kotlin 1.9.24 y Compose Compiler 1.5.14
+        // Compatible con Kotlin 1.9.24 y Compose Compiler 1.5.14
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 
@@ -43,7 +43,7 @@ android {
     }
 
     packaging {
-        // ✅ Permitir ejecución en emuladores x86_64
+        // Permitir ejecución en emuladores x86_64
         jniLibs {
             useLegacyPackaging = true
         }
@@ -57,21 +57,24 @@ kotlin {
 
 dependencies {
 
-// 🎥 CameraX (para usar la cámara del dispositivo)
-implementation("androidx.camera:camera-camera2:1.3.4")
-implementation("androidx.camera:camera-lifecycle:1.3.4")
-implementation("androidx.camera:camera-view:1.3.4")
-implementation("com.google.accompanist:accompanist-permissions:0.34.0") 
+    // --- Cámara y QR (Solución de errores de importación) ---
+    // Permisos Compose (para @OptIn(ExperimentalPermissionsApi::class))
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    
+    // ML Kit para escaner QR
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+    
+    // Librería para generar códigos QR (Versión 3.5.3 es la más estable)
+    implementation("com.google.zxing:core:3.5.3")
+    
+    // Dependencias de CameraX (todas juntas y no duplicadas)
+    implementation("androidx.camera:camera-core:1.3.4")
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
 
-//escaneo de códigos QR
-implementation("com.google.mlkit:barcode-scanning:17.2.0")
 
-//Librería para generar códigos QR
-implementation("com.google.zxing:core:3.5.2")
-
-
-
-    // Jetpack Compose
+    // --- Jetpack Compose ---
     implementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("androidx.activity:activity-compose:1.9.0")
     implementation("androidx.compose.ui:ui")
@@ -79,27 +82,17 @@ implementation("com.google.zxing:core:3.5.2")
     implementation("androidx.compose.ui:ui-tooling-preview")
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.navigation:navigation-compose:2.7.7")
+    implementation("androidx.compose.material:material-icons-extended") // Material Icons
 
-    // Ciclo de vida y corrutinas
+    // --- Ciclo de vida y Corrutinas ---
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")
 
-    // DataStore (para token, nombre y rol persistentes)
+    // --- DataStore ---
     implementation("androidx.datastore:datastore-preferences:1.1.1")
 
-    // Networking (Retrofit + Moshi + OkHttp)
+    // --- Networking (Retrofit + Moshi + OkHttp) ---
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.squareup.retrofit2:converter-moshi:2.11.0")
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
-
-    // CameraX + ML Kit
-    implementation("androidx.camera:camera-core:1.3.4")
-    implementation("androidx.camera:camera-camera2:1.3.4")
-    implementation("androidx.camera:camera-lifecycle:1.3.4")
-    implementation("androidx.camera:camera-view:1.3.4")
-    implementation("com.google.mlkit:barcode-scanning:17.2.0")
-
-    // QR y Material Icons
-    implementation("com.google.zxing:core:3.5.3")
-    implementation("androidx.compose.material:material-icons-extended")
 }

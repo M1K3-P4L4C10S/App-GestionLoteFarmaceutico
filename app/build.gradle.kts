@@ -57,6 +57,8 @@ kotlin {
 
 dependencies {
 
+implementation "com.google.accompanist:accompanist-permissions:0.30.1"
+
     // --- Cámara y QR (Solución de errores de importación) ---
     // Permisos Compose (para @OptIn(ExperimentalPermissionsApi::class))
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")

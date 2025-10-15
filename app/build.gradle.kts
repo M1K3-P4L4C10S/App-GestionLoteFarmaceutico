@@ -77,9 +77,12 @@ dependencies {
     // --- Generación de códigos QR ---
     implementation("com.google.zxing:core:3.5.3")
 
-    // --- Accompanist Permissions ---
-    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+    // Para compatibilidad con ContextCompat, permisos, etc.
+    implementation("androidx.core:core-ktx:1.13.1")
 
+    // Para compatibilidad con Activity y permisos
+    implementation("androidx.activity:activity-ktx:1.9.0")
+    
     // --- Ciclo de vida y Corrutinas ---
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.8.1")

@@ -29,7 +29,6 @@ android {
     }
 
     composeOptions {
-        // Compatible con Kotlin 1.9.24 y Compose Compiler 1.5.14
         kotlinCompilerExtensionVersion = "1.5.14"
     }
 
@@ -43,7 +42,6 @@ android {
     }
 
     packaging {
-        // Permitir ejecución en emuladores x86_64
         jniLibs {
             useLegacyPackaging = true
         }
@@ -56,26 +54,6 @@ kotlin {
 }
 
 dependencies {
-
-implementation "com.google.accompanist:accompanist-permissions:0.30.1"
-
-    // --- Cámara y QR (Solución de errores de importación) ---
-    // Permisos Compose (para @OptIn(ExperimentalPermissionsApi::class))
-    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
-    
-    // ML Kit para escaner QR
-    implementation("com.google.mlkit:barcode-scanning:17.2.0")
-    
-    // Librería para generar códigos QR (Versión 3.5.3 es la más estable)
-    implementation("com.google.zxing:core:3.5.3")
-    
-    // Dependencias de CameraX (todas juntas y no duplicadas)
-    implementation("androidx.camera:camera-core:1.3.4")
-    implementation("androidx.camera:camera-camera2:1.3.4")
-    implementation("androidx.camera:camera-lifecycle:1.3.4")
-    implementation("androidx.camera:camera-view:1.3.4")
-
-
     // --- Jetpack Compose ---
     implementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("androidx.activity:activity-compose:1.9.0")
@@ -85,6 +63,21 @@ implementation "com.google.accompanist:accompanist-permissions:0.30.1"
     debugImplementation("androidx.compose.ui:ui-tooling")
     implementation("androidx.navigation:navigation-compose:2.7.7")
     implementation("androidx.compose.material:material-icons-extended") // Material Icons
+
+    // --- CameraX ---
+    implementation("androidx.camera:camera-core:1.3.4")
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
+
+    // --- ML Kit para escaneo QR ---
+    implementation("com.google.mlkit:barcode-scanning:17.2.0")
+
+    // --- Generación de códigos QR ---
+    implementation("com.google.zxing:core:3.5.3")
+
+    // --- Accompanist Permissions ---
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
     // --- Ciclo de vida y Corrutinas ---
     implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.7.0")

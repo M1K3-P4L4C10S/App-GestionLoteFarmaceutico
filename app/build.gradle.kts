@@ -55,7 +55,6 @@ kotlin {
 
 dependencies {
 
-implementation("com.google.accompanist:accompanist-permissions:0.31.5-beta")
     // --- Jetpack Compose ---
     implementation(platform("androidx.compose:compose-bom:2024.04.01"))
     implementation("androidx.activity:activity-compose:1.9.0")

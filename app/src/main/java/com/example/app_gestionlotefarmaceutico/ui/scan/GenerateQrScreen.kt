@@ -1,161 +1,200 @@
-package com.example.app_gestionlotefarmaceutico.ui.scan
+package com.example.app_gestionlotefarmaceutico.ui.generateqr
 
 import android.graphics.Bitmap
-import android.graphics.Color
-import android.os.Environment
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.google.zxing.BarcodeFormat
-import com.google.zxing.WriterException
 import com.google.zxing.qrcode.QRCodeWriter
-import java.io.File
-import java.io.FileOutputStream
-import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.*
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun GenerateQrScreen(navController: NavHostController) {
-    val context = LocalContext.current
-    var nombre by remember { mutableStateOf(TextFieldValue("")) }
-    var lote by remember { mutableStateOf(TextFieldValue("")) }
-    var cantidad by remember { mutableStateOf(TextFieldValue("")) }
-    var caducidad by remember { mutableStateOf(TextFieldValue("")) }
+fun GenerateQRScreen(navController: NavHostController) {
+    // Variables del formulario
+    var nombreMed by remember { mutableStateOf("") }
+    var lote by remember { mutableStateOf("") }
+    var fechaCaducidad by remember { mutableStateOf("") }
+    var cantidad by remember { mutableStateOf("") }
+    var proveedor by remember { mutableStateOf("") }
+
     var qrBitmap by remember { mutableStateOf<Bitmap?>(null) }
-    var saveMessage by remember { mutableStateOf<String?>(null) }
+    var errorMsg by remember { mutableStateOf("") }
 
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        Text("Generar Código QR de Producto", style = MaterialTheme.typography.headlineSmall)
+    // Colores iguales que HomeScreen
+    val primaryBlue = Color(0xFF1565C0)
+    val darkBlue = Color(0xFF0D47A1)
+    val lightAqua = Color(0xFFB2EBF2)
+    val lightCeleste = Color(0xFFB3E5FC)
+    val whiteAccent = Color(0xFFE8F5E9)
 
-        OutlinedTextField(
-            value = nombre,
-            onValueChange = { nombre = it },
-            label = { Text("Nombre del producto") },
-            modifier = Modifier.fillMaxWidth()
-        )
+    val backgroundGradient = Brush.verticalGradient(
+        colors = listOf(lightCeleste, whiteAccent, lightAqua)
+    )
 
-        OutlinedTextField(
-            value = lote,
-            onValueChange = { lote = it },
-            label = { Text("Código de lote") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = cantidad,
-            onValueChange = { cantidad = it },
-            label = { Text("Cantidad") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        OutlinedTextField(
-            value = caducidad,
-            onValueChange = { caducidad = it },
-            label = { Text("Fecha de caducidad (AAAA-MM-DD)") },
-            modifier = Modifier.fillMaxWidth()
-        )
-
-        Button(
-            onClick = {
-                val contenido = """
-                    Producto: ${nombre.text}
-                    Lote: ${lote.text}
-                    Cantidad: ${cantidad.text}
-                    Caducidad: ${caducidad.text}
-                """.trimIndent()
-
-                qrBitmap = generateQRCode(contenido)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = nombre.text.isNotBlank() && lote.text.isNotBlank()
-        ) {
-            Text("Generar QR")
-        }
-
-        qrBitmap?.let { bitmap ->
-            Spacer(Modifier.height(16.dp))
-            Image(
-                bitmap = bitmap.asImageBitmap(),
-                contentDescription = "Código QR generado",
-                modifier = Modifier.size(250.dp)
-            )
-            Spacer(Modifier.height(16.dp))
-
-            Button(
-                onClick = {
-                    val saved = saveQrImageWithDate(context, bitmap, lote.text)
-                    saveMessage = if (saved) "✅ QR guardado correctamente" else "❌ Error al guardar"
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        "Generar Código QR",
+                        modifier = Modifier.fillMaxWidth(),
+                        textAlign = TextAlign.Center,
+                        style = MaterialTheme.typography.headlineSmall.copy(
+                            fontWeight = FontWeight.ExtraBold,
+                            color = Color.White
+                        )
+                    )
                 },
-                modifier = Modifier.fillMaxWidth()
+                navigationIcon = {
+                    IconButton(onClick = { navController.popBackStack() }) {
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Atrás", tint = Color.White)
+                    }
+                },
+                colors = TopAppBarDefaults.topAppBarColors(containerColor = darkBlue)
+            )
+        }
+    ) { paddingValues ->
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(backgroundGradient)
+                .padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(24.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text("Guardar QR en galería")
-            }
+                Spacer(modifier = Modifier.height(16.dp))
 
-            saveMessage?.let {
-                Text(
-                    it,
-                    color = if (it.contains("Error")) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary
+                // --- FORMULARIO ---
+                OutlinedTextField(
+                    value = nombreMed,
+                    onValueChange = { nombreMed = it },
+                    label = { Text("Nombre del medicamento*") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
                 )
-            }
+                Spacer(modifier = Modifier.height(12.dp))
 
-            OutlinedButton(onClick = { navController.popBackStack() }) {
-                Text("Volver al inicio")
+                OutlinedTextField(
+                    value = lote,
+                    onValueChange = { lote = it },
+                    label = { Text("Lote*") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = fechaCaducidad,
+                    onValueChange = { fechaCaducidad = it },
+                    label = { Text("Fecha de caducidad (DD/MM/AAAA)*") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = cantidad,
+                    onValueChange = { cantidad = it },
+                    label = { Text("Cantidad disponible*") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+
+                OutlinedTextField(
+                    value = proveedor,
+                    onValueChange = { proveedor = it },
+                    label = { Text("Proveedor (opcional)") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp)
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // --- MENSAJE DE ERROR ---
+                if (errorMsg.isNotEmpty()) {
+                    Text(
+                        text = errorMsg,
+                        color = Color.Red,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(8.dp)
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
+                // --- BOTÓN GENERAR QR ---
+                Button(
+                    onClick = {
+                        // Validación
+                        if (nombreMed.isBlank() || lote.isBlank() || fechaCaducidad.isBlank() || cantidad.isBlank()) {
+                            errorMsg = "Por favor completa todos los campos obligatorios (*)"
+                            qrBitmap = null
+                        } else {
+                            errorMsg = ""
+                            val data = "Medicamento:$nombreMed|Lote:$lote|Caduca:$fechaCaducidad|Cantidad:$cantidad|Proveedor:$proveedor"
+                            qrBitmap = generateQRCode(data)
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(50.dp),
+                    colors = ButtonDefaults.buttonColors(containerColor = primaryBlue),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Text("Generar QR", color = Color.White, fontWeight = FontWeight.Bold)
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                // --- MOSTRAR QR ---
+                qrBitmap?.let {
+                    Image(
+                        bitmap = it.asImageBitmap(),
+                        contentDescription = "Código QR",
+                        modifier = Modifier
+                            .size(250.dp)
+                            .padding(8.dp)
+                    )
+                }
             }
         }
     }
 }
 
-/**
- * 🧩 Genera el código QR a partir de un texto
- */
-fun generateQRCode(text: String): Bitmap? {
-    val writer = QRCodeWriter()
-    return try {
-        val bitMatrix = writer.encode(text, BarcodeFormat.QR_CODE, 512, 512)
-        val bitmap = Bitmap.createBitmap(512, 512, Bitmap.Config.RGB_565)
-        for (x in 0 until 512) {
-            for (y in 0 until 512) {
-                bitmap.setPixel(x, y, if (bitMatrix[x, y]) Color.BLACK else Color.WHITE)
-            }
+// --- FUNCION PARA GENERAR BITMAP DEL QR ---
+fun generateQRCode(text: String): Bitmap {
+    val size = 512 // tamaño del QR
+    val bits = QRCodeWriter().encode(text, BarcodeFormat.QR_CODE, size, size)
+    val bmp = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+    for (x in 0 until size) {
+        for (y in 0 until size) {
+            bmp.setPixel(x, y, if (bits[x, y]) Color.Black.hashCode() else Color.White.hashCode())
         }
-        bitmap
-    } catch (e: WriterException) {
-        e.printStackTrace()
-        null
     }
-}
-
-/**
- * 💾 Guarda el QR con el nombre del lote y la fecha actual.
- */
-fun saveQrImageWithDate(context: android.content.Context, bitmap: Bitmap, loteId: String): Boolean {
-    val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm", Locale.getDefault())
-    val fileName = "${loteId}_${dateFormat.format(Date())}.png"
-    return try {
-        val directory = File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES), "QR_Codes")
-        if (!directory.exists()) directory.mkdirs()
-        val file = File(directory, fileName)
-        FileOutputStream(file).use { out ->
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
-        }
-        true
-    } catch (e: IOException) {
-        e.printStackTrace()
-        false
-    }
+    return bmp
 }
